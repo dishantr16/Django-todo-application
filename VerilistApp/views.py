@@ -1,11 +1,11 @@
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import request, viewsets, permissions
-from django.contrib.auth import authenticate, login as loginUser, logout
+from re import search
+from django.contrib.auth.models import User
+from rest_framework.decorators import api_view
+from rest_framework import request, views
 from .serializers import ListSerializer, TaskSerializer
-from .models import List, Task
-from rest_framework import status
+from .utils import create_response
+from .services import *
+from VerilistApp import serializers
 
 
 
@@ -23,68 +23,34 @@ def apiOverview(request):
         'Task Edit': '/checklist/<id>/task/<taskid>'
 
     }
-    return Response(api_urls)
+    create_response(data=api_urls,code=200)
 
 
-class CheckListViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = ListSerializer
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+class TaskListViewSet(views.APIView):
+    def get(self,request,task_id):
+        if not request.user.is_authenticated:
+            return create_response(data="User Not Authenticated",code=403)
+        taskList = get_list_or_404(task_id,request.user)
+        if taskList == None:
+            return create_response(data="User Not Allowed to View the List",code=403)
+        return create_response(data=taskList.get_details(),code=200)    
+    
+    def post(self,request):
+        if not request.user.is_authenticated:
+            return create_response(data="User Not Authenticated",code=403)
+        serializer_instance = ListSerializer(data=request.data)
 
-    def get_queryset(self):
-        user = self.request.user
-        return List.objects.create(user=user)
+        if not serializer_instance.is_valid():
+            return create_response(data=serializer_instance.errors,code=400)
+        data = serializer_instance.validated_data;
+        user = User.objects.get(id=request.user.id)
+        taskList = List.objects.create(name=data.get("name",""),user=user,description=data.get("description","")
+        )
+        taskList.save()
+        return create_response(data=taskList.id,code=200,message="Created Successfully")
 
-    def create(self, request, *args, **kwargs):
-        serializer = ListSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
             
-# class TaskViewSet(viewsets.ModelViewSet):
-#     queryset = Task.objects.all()
-#     serializer_class = TaskSerializer
-#     authentication_classes = [SessionAuthentication]
 
-#     def get_queryset(self):
-#         user = self.request.user
-#         return Task.objects.filter(parent_list_user=user)
 
-# class CheckList(viewsets.ModelViewSet):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = ListSerializer
-#     # queryset = List.objects.all()
-
-#     def get_queryset(self):
-#         if self.request.user == List.user:
-#             return List.objects.all()
-#         return List.objects.filter(user=self.request.user)
-
-#     def perform_create(self, serializer):
-#         serializer.save(user=self.request.user)
-    
-
-#     def perform_destroy(self, instance):
-#         instance.visible=False
-#         instance.save()
-
-# class CheckListView(generics.RetrieveUpdateDestroyAPIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = ListSerializer
-    # queryset = List.objects.all()
-
-# @api_view(['GET'])
-# def CheckList(request):
-
-#     if request.user.is_authenticated:
-#         lists = List.objects.all()
-#         serializers = ListSerializer(lists, many= True)
-#         return Response(serializers.data)
-    
-# @api_view(['GET'])
-# def CheckListView(request, id):
-#     list_view = List.objects.get(id=id)
-#     serializer = ListSerializer(list_view, many = False)
-    # return Response(serializer.data)

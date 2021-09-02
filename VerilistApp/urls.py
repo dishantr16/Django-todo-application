@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from . import views
-from .views import CheckListViewSet
+
 
 # router = routers.DefaultRouter()
 # router.register("lists", views.CheckListViewSet)
@@ -10,11 +10,7 @@ from .views import CheckListViewSet
 
 urlpatterns =  [
     path('', views.apiOverview, name='api-overview'),
-    path('checklist/', CheckListViewSet.as_view(), name='checklist view'),
-    # path("checklist/"),
-    
-    
-    # CheckListViewSet(), name='checklist'),
-    # path('checklist/', views.CheckList, name='CheckList'),
-    # path('checklist/<id>/', views.CheckListView, name='CheckList View')
+    path("checklists/<uuid:task_id>/",views.TaskListViewSet.as_view()),
+    path("checklists/new/",views.TaskListViewSet.as_view())
+
 ]
