@@ -7,7 +7,7 @@ from .constants import status_choices, priority_choices
 
 class List(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=50, null=True) #listName
+    name = models.CharField(max_length=50, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.CharField(max_length=255)
     creation_date = models.DateTimeField(default=timezone.now)
@@ -21,8 +21,8 @@ class Task(models.Model):
     priority = models.CharField(max_length=6, choices=priority_choices)
     date = models.DateTimeField(auto_now_add=True)
     description = models.CharField(max_length=255, null=True)
-    title = models.CharField(max_length=50) #Task Name
-    list_name =  models.ForeignKey(List, default=True, on_delete=models.CASCADE) #Parent List Name
+    list_name =  models.ForeignKey(List, on_delete=models.CASCADE, related_name='tasks')
+    title = models.CharField(max_length=50)
     status = models.CharField(max_length=10, choices=status_choices)
     taskId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
