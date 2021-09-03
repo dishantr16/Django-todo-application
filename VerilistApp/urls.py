@@ -1,20 +1,15 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
+
 from . import views
-from .views import CheckListViewSet
 
-# router = routers.DefaultRouter()
-# router.register("lists", views.CheckListViewSet)
 
-# app_name = "VerilistApp"
-
-urlpatterns =  [
+urlpatterns = [
     path('', views.apiOverview, name='api-overview'),
-    path('checklist/', CheckListViewSet.as_view(), name='checklist view'),
-    # path("checklist/"),
-    
-    
-    # CheckListViewSet(), name='checklist'),
-    # path('checklist/', views.CheckList, name='CheckList'),
-    # path('checklist/<id>/', views.CheckListView, name='CheckList View')
+    path('checklists/', views.TaskListViewSet.as_view()),
+    path('checklists/<uuid:list_id>/', views.TaskListDetailViewSet.as_view()),
+    path('checklists/new/', views.TaskListViewSet.as_view()),
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserListDetail.as_view()),
+    path('checklists/<uuid:list_id>/tasks/', views.TaskView.as_view()),
+    path('checklists/<uuid:list_id>/tasks/new/', views.TaskView.as_view()),
 ]
