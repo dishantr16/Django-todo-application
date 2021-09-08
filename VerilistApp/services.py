@@ -1,4 +1,6 @@
 from .models import List, Task
+from django.contrib.auth.models import User
+from datetime import date
 
 def get_list_or_404(list_id, user):
     if not list_id:
@@ -9,13 +11,3 @@ def get_list_or_404(list_id, user):
     if not task.user == user:
         return None
     return task
-
-def get_task_or_404(task_id, list_id, user):
-    if not task_id:
-        return None
-    if not list_id:
-        return None
-    tasks = Task.objects.get(id=task_id)
-    if not tasks.user == user:
-        return None
-    return tasks

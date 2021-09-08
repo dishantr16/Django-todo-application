@@ -1,0 +1,37 @@
+<html>
+    <body>
+        <br>
+
+        <h2>This is the task Summary</h2>
+        <h3>Task Details</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>due_date</th>
+                    <th>Completed_At</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for tasks in task %}
+                    <tr>
+                        <td>{{ tasks.title }}</td>
+                        <td>{{ tasks.description }}</td>
+                        <td>{{ tasks.status }}</td>
+                        <td>{{ tasks.priority }}</td>
+                        <td>{{ tasks.due_date }}</td>
+                        <td>{{ tasks.completed_At }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+
+    </body>
+</html>
