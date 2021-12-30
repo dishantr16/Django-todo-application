@@ -8,6 +8,6 @@ def get_list_or_404(list_id, user):
     if not user:
         return None
     task = List.objects.get(id=list_id)
-    if not task.user == user:
+    if task.user != user:
         return None
     return task
